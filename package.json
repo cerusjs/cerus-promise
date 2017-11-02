@@ -1,6 +1,6 @@
 {
 	"name": "cerus-promise",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "The promise module for CerusJS",
 	"main": "index.js",
 	"repository": {
@@ -13,5 +13,5 @@
 	},
 	"scripts": {},
 	"homepage": "https://github.com/cerusjs/cerus-promise",
-	"dependencies": {} 
+	"dependencies": {}
 }
