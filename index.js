@@ -1,12 +1,14 @@
 module.exports = function() {
-	var self = {};
-
+	var plugin = {};
 	var package = require("./package.json");
+	var promise = require("./lib/promise");
 	
-	self.name = package["name"];
-	self.version = package["version"];
+	plugin.name = package["name"];
+	plugin.version = package["version"];
 
-	self.promise = require("./lib/promise");
+	plugin.promise = function(func) {
+		return new promise(func);
+	}
 
-	return self;
+	return plugin;
 }
