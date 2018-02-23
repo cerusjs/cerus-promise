@@ -123,4 +123,23 @@ describe("promise", function() {
 			});
 		});
 	});
+
+	describe("child", function() {
+		it("should work", function(done) {
+			promise(function(event) {
+				event("test1", "test");
+			})
+			.on("test1", function(data) {
+				expect(data).to.equal("test");
+				
+				return promise(function(event) {
+					event("test2", "test");
+				});
+			})
+			.on("test2", function(data) {
+				expect(data).to.equal("test");
+				done();
+			});
+		});
+	});
 });
