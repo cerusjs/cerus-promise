@@ -1,0 +1,24 @@
+{
+	"name": "cerus-promise",
+	"version": "0.1.1",
+	"description": "The promise module for CerusJS",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cerusjs/cerus-promise.git"
+	},
+	"author": "cerusjs",
+	"bugs": {
+		"url": "https://github.com/cerusjs/cerus-promise/issues"
+	},
+	"scripts": {
+		"test": "./node_modules/.bin/mocha tests --reporter spec",
+		"lint": "eslint lib/"
+	},
+	"homepage": "https://github.com/cerusjs/cerus-promise",
+	"dependencies": {},
+	"devDependencies": {
+		"chai": "^4.1.2",
+		"mocha": "^5.0.0"
+	}
+}
