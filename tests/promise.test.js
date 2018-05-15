@@ -83,14 +83,14 @@ describe("promise", function() {
 		context("with multiple events", function() {
 			it("should work", function(done) {
 				promise(function(event) {
-					wait(function() {event("test1", "test")}, 1);
-					wait(function() {event("test2", "test")}, 2);
-				})
-				.on("test1", function(data) {
-					expect(data).to.equal("test");
+					wait(function() {event("test1", "test1")}, 1);
+					wait(function() {event("test2", "test2")}, 2);
 				})
 				.on("test2", function(data) {
-					expect(data).to.equal("test");
+					expect(data).to.equal("test2");
+				})
+				.on("test1", function(data) {
+					expect(data).to.equal("test1");
 					done();
 				});
 			});
