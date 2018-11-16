@@ -1,1 +1,2 @@
-cerus-promise
+## [CerusJS](https://cerusjs.github.io/): cerus-promise
+This is the promise module for CerusJS. It's used to create a custom promise that also allows for the usage of events. See the documentation for cerus-promise [here](https://cerusjs.github.io/views/cerus-promise/readme.html).
