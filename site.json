@@ -1,5 +1,5 @@
 {
 	"readme": "README.md",
 	"changelog": "changelog.md",
-	"reference": ["lib"]
+	"reference": ["lib", "index.js"]
 }
