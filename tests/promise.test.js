@@ -13,21 +13,11 @@ describe("promise", function() {
 				expect(func).to.throw();
 			});
 		});
-
-		context("with a function as parameters", function() {
-			it("shouldn't throw an error", function() {
-				var func = function() {
-					promise(function() {})
-				}
-
-				expect(func).to.not.throw();
-			});
-		});
 	});
 
 	describe("non-delayed", function() {
 		context("with a single event", function() {
-			it("should work", function(done) {
+			it("should resolve the handler", function(done) {
 				promise(function(event) {
 					event("test");
 				})
@@ -39,7 +29,7 @@ describe("promise", function() {
 		});
 
 		context("with multiple events", function() {
-			it("should work", function(done) {
+			it("should resolve the handler", function(done) {
 				promise(function(event) {
 					event("test1", "test");
 					event("test2", "test");
@@ -55,7 +45,7 @@ describe("promise", function() {
 		});
 
 		context("with an error thrown", function() {
-			it("should work", function(done) {
+			it("should resolve the handler", function(done) {
 				promise(function(event) {
 					event("error", "test");
 				})
@@ -69,7 +59,7 @@ describe("promise", function() {
 
 	describe("delayed", function() {
 		context("with a single event", function() {
-			it("should work", function(done) {
+			it("should resolve the handler", function(done) {
 				promise(function(event) {
 					wait(function() {event("test")}, 1);
 				})
@@ -81,7 +71,7 @@ describe("promise", function() {
 		});
 
 		context("with multiple events", function() {
-			it("should work", function(done) {
+			it("should resolve the handler", function(done) {
 				promise(function(event) {
 					wait(function() {event("test1", "test1")}, 1);
 					wait(function() {event("test2", "test2")}, 2);
@@ -109,8 +99,8 @@ describe("promise", function() {
 		});
 	});
 
-	describe("stack", function() {
-		it("should work", function(done) {
+	describe("#stack", function() {
+		it("should stack the event to the lower promise", function(done) {
 			promise(function(event) {
 				promise(function(event) {
 					event("done", "test");
@@ -125,7 +115,7 @@ describe("promise", function() {
 	});
 
 	describe("child", function() {
-		it("should work", function(done) {
+		it("should call the child when it has been added", function(done) {
 			promise(function(event) {
 				event("test1", "test");
 			})
@@ -140,6 +130,14 @@ describe("promise", function() {
 				expect(data).to.equal("test");
 				done();
 			});
+		});
+	});
+
+	describe("#promisify", function() {
+		it("should wait until the event is resolved", async function() {
+			let value = await promise(event => event("done", "test")).then().promisify();
+
+			expect(value).to.deep.equal(["test"]);
 		});
 	});
 });
