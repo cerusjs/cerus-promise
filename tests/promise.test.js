@@ -1,5 +1,6 @@
 var expect = require("chai").expect;
-var promise = require("./../index")().promise;
+var index = require("../index")();
+var promise = index.promise;
 var wait = setTimeout;
 
 describe("promise", function() {
@@ -140,4 +141,35 @@ describe("promise", function() {
 			expect(value).to.deep.equal(["test"]);
 		});
 	});
+});
+
+describe("promisify", function() {
+	context("with one data parameter", function() {
+		it("should pass through the data", function(done) {
+			let func = function(caLLback) {
+				caLLback("test");
+			};
+	
+			index.promisify(func)()
+			.then(data => {
+				expect(data).to.equal("test");
+				done();
+			});
+		});
+	});
+
+	context("with an error as first parameter", function() {
+		it("should pass through the error", function(done) {
+			let func = function(caLLback) {
+				caLLback(new Error("test"));
+			};
+	
+			index.promisify(func)()
+			.catch(err => {
+				expect(err).to.be.an.instanceof(Error);
+				done();
+			});
+		});
+	});
+	
 });
