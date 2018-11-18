@@ -26,7 +26,7 @@ describe("promise", function() {
 				.then(function(event) {
 					expect(event).to.equal("test");
 					done();
-				}, true);
+				}, {event: true});
 			});
 		});
 
@@ -68,7 +68,7 @@ describe("promise", function() {
 				.then(function(event) {
 					expect(event).to.equal("test");
 					done();
-				}, true);
+				}, {event: true});
 			});
 		});
 
@@ -140,6 +140,36 @@ describe("promise", function() {
 			let value = await promise(event => event("done", "test")).shadow();
 
 			expect(value).to.deep.equal("test");
+		});
+	});
+
+	describe("passthrough", function() {
+		context("with a .then function", function() {
+			it("should pass through the data", function(done) {
+				promise(function(event) {
+					event("success", "test");
+				})
+				.then(data => data + "1", {passthrough: true})
+				.then(data => {
+					expect(data).to.equal("test1");
+
+					done();
+				});
+			});
+		});
+
+		context("with a .catch function", function() {
+			it("should pass through the data", function(done) {
+				promise(function(event) {
+					event("error", "test");
+				})
+				.catch(data => data + "1", {passthrough: true})
+				.catch(data => {
+					expect(data).to.equal("test1");
+
+					done();
+				});
+			});
 		});
 	});
 });
