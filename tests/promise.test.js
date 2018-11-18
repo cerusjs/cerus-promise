@@ -134,11 +134,11 @@ describe("promise", function() {
 		});
 	});
 
-	describe("#promisify", function() {
+	describe("#shadow", function() {
 		it("should wait until the event is resolved", async function() {
-			let value = await promise(event => event("done", "test")).then().promisify();
+			let value = await promise(event => event("done", "test")).shadow();
 
-			expect(value).to.deep.equal(["test"]);
+			expect(value).to.deep.equal("test");
 		});
 	});
 });
