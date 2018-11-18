@@ -19,22 +19,26 @@ module.exports = function() {
 	 * [Click me](/views/cerus-promise/reference/promise.html) for the documentation about the 
 	 * promise class.
 	 * @param {Function} func The function to promisify.
+	 * @param {Object} (bindings = this) The object to bind to the function call.
 	 * @returns {Function} The promisified version of the original function.
 	 * @class promisify
 	 */
-	plugin.promisify = function(func) {
+	plugin.promisify = function(func, bindings) {
 		if(typeof func !== "function") {
 			throw new TypeError("The argument func must be a function");
 		}
 
 		return (...args) => {
 			return new promise(event => {
-				func(...args, (...callbackArgs) => {
-					if(callbackArgs.length > 0 && callbackArgs[0] instanceof Error) {
-						return event("error", callbackArgs[0]);
+				func.call(bindings || this, ...args, (err, ...values) => {
+					if(err instanceof Error) {
+						return event("error", err);
+					}
+					else if(err !== null) {
+						values.unshift(err);
 					}
 
-					event("success", ...callbackArgs);
+					event("success", ...values);
 				});
 			});
 		}
