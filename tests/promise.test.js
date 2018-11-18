@@ -5,13 +5,14 @@ var wait = setTimeout;
 
 describe("promise", function() {
 	describe("#constructor", function() {
-		context("with no parameters", function() {
-			it("should throw an error", function() {
-				var func = function() {
-					promise()
-				}
+		context("with a promise as parameter", function() {
+			it("should create an event on resolve", function(done) {
+				promise(new Promise(resolve => resolve("test")))
+				.then(data => {
+					expect(data).to.equal("test");
 
-				expect(func).to.throw();
+					done();
+				});
 			});
 		});
 	});
