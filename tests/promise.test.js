@@ -3,10 +3,10 @@ var index = require("../index")();
 var promise = index.promise;
 var wait = setTimeout;
 
-describe("promise", function() {
-	describe("#constructor", function() {
-		context("with a promise as parameter", function() {
-			it("should create an event on resolve", function(done) {
+describe("promise", () => {
+	describe("#constructor", () => {
+		context("with a promise as parameter", () => {
+			it("should create an event on resolve", done => {
 				promise(new Promise(resolve => resolve("test")))
 				.then(data => {
 					expect(data).to.equal("test");
@@ -17,41 +17,41 @@ describe("promise", function() {
 		});
 	});
 
-	describe("non-delayed", function() {
-		context("with a single event", function() {
-			it("should resolve the handler", function(done) {
-				promise(function(event) {
+	describe("non-delayed", () => {
+		context("with a single event", () => {
+			it("should resolve the handler", done => {
+				promise(event => {
 					event("test");
 				})
-				.then(function(event) {
+				.then(event => {
 					expect(event).to.equal("test");
 					done();
 				}, {event: true});
 			});
 		});
 
-		context("with multiple events", function() {
-			it("should resolve the handler", function(done) {
-				promise(function(event) {
+		context("with multiple events", () => {
+			it("should resolve the handler", done => {
+				promise(event => {
 					event("test1", "test");
 					event("test2", "test");
 				})
-				.on("test1", function(data) {
+				.on("test1", data => {
 					expect(data).to.equal("test");
 				})
-				.on("test2", function(data) {
+				.on("test2", data => {
 					expect(data).to.equal("test");
 					done();
 				});
 			});
 		});
 
-		context("with an error thrown", function() {
-			it("should resolve the handler", function(done) {
-				promise(function(event) {
+		context("with an error thrown", () => {
+			it("should resolve the handler", done => {
+				promise(event => {
 					event("error", "test");
 				})
-				.catch(function(err) {
+				.catch(err => {
 					expect(err).to.equal("test");
 					done();
 				});
@@ -59,41 +59,41 @@ describe("promise", function() {
 		});
 	});
 
-	describe("delayed", function() {
-		context("with a single event", function() {
-			it("should resolve the handler", function(done) {
-				promise(function(event) {
-					wait(function() {event("test")}, 1);
+	describe("delayed", () => {
+		context("with a single event", () => {
+			it("should resolve the handler", done => {
+				promise(event => {
+					wait(() => {event("test")}, 1);
 				})
-				.then(function(event) {
+				.then(event => {
 					expect(event).to.equal("test");
 					done();
 				}, {event: true});
 			});
 		});
 
-		context("with multiple events", function() {
-			it("should resolve the handler", function(done) {
-				promise(function(event) {
-					wait(function() {event("test1", "test1")}, 1);
-					wait(function() {event("test2", "test2")}, 2);
+		context("with multiple events", () => {
+			it("should resolve the handler", done => {
+				promise(event => {
+					wait(() => {event("test1", "test1")}, 1);
+					wait(() => {event("test2", "test2")}, 2);
 				})
-				.on("test2", function(data) {
+				.on("test2", data => {
 					expect(data).to.equal("test2");
 				})
-				.on("test1", function(data) {
+				.on("test1", data => {
 					expect(data).to.equal("test1");
 					done();
 				});
 			});
 		});
 
-		context("with an error thrown", function() {
-			it("should work", function(done) {
-				promise(function(event) {
-					wait(function() {event("error", "test")}, 1);
+		context("with an error thrown", () => {
+			it("should work", done => {
+				promise(event => {
+					wait(() => {event("error", "test")}, 1);
 				})
-				.catch(function(err) {
+				.catch(err => {
 					expect(err).to.equal("test");
 					done();
 				});
@@ -101,52 +101,75 @@ describe("promise", function() {
 		});
 	});
 
-	describe("#stack", function() {
-		it("should stack the event to the lower promise", function(done) {
-			promise(function(event) {
-				promise(function(event) {
+	describe("#stack", () => {
+		it("should stack the event to the lower promise", done => {
+			promise(event => {
+				promise(event => {
 					event("done", "test");
 				})
 				.stack(event);
 			})
-			.then(function(data) {
+			.then(data => {
 				expect(data).to.equal("test");
 				done();
 			});
 		});
 	});
 
-	describe("child", function() {
-		it("should call the child when it has been added", function(done) {
-			promise(function(event) {
-				event("test1", "test");
-			})
-			.on("test1", function(data) {
-				expect(data).to.equal("test");
-				
-				return promise(function(event) {
-					event("test2", "test");
+	describe("child", () => {
+		context("when parent is called once", () => {
+			it("should call the child when it has been added", done => {
+				promise(event => {
+					event("test1", "test");
+				})
+				.on("test1", data => {
+					expect(data).to.equal("test");
+					
+					return promise(event => {
+						event("test2", "test");
+					});
+				})
+				.on("test2", data => {
+					expect(data).to.equal("test");
+					done();
 				});
-			})
-			.on("test2", function(data) {
-				expect(data).to.equal("test");
-				done();
+			});
+		});
+
+		context("when the parent is called multiple times", () => {
+			it("should call the child multiple times", done => {
+				promise(event => {
+					event("test1", "testa");
+					event("test1", "testb");
+				})
+				.on("test1", data => {
+					if(data === "testa") return promise(event => event("test2", "testc"));
+					if(data === "testb") return promise(event => event("test2", "testd"));
+
+					throw new Error("data is incorrect");
+				})
+				.on("test2", data => {
+					if(data === "testc") return;
+					if(data === "testd") return done();
+					
+					throw new Error("data is incorrect");
+				});
 			});
 		});
 	});
 
-	describe("#shadow", function() {
-		it("should wait until the event is resolved", async function() {
+	describe("#shadow", () => {
+		it("should wait until the event is resolved", async () => {
 			let value = await promise(event => event("done", "test")).shadow();
 
 			expect(value).to.deep.equal("test");
 		});
 	});
 
-	describe("passthrough", function() {
-		context("with a .then function", function() {
-			it("should pass through the data", function(done) {
-				promise(function(event) {
+	describe("passthrough", () => {
+		context("with a .then function", () => {
+			it("should pass through the data", done => {
+				promise(event => {
 					event("success", "test");
 				})
 				.then(data => data + "1", {passthrough: true})
@@ -158,9 +181,24 @@ describe("promise", function() {
 			});
 		});
 
-		context("with a .catch function", function() {
-			it("should pass through the data", function(done) {
-				promise(function(event) {
+		context("with a .then function and the multi option", () => {
+			it("should pass through the data", done => {
+				promise(event => {
+					event("success", "test");
+				})
+				.then(data => [data + "1", data + "2"], {passthrough: true, multi: true})
+				.then((data1, data2) => {
+					expect(data1).to.equal("test1");
+					expect(data2).to.equal("test2");
+
+					done();
+				});
+			});
+		});
+
+		context("with a .catch function", () => {
+			it("should pass through the data", done => {
+				promise(event => {
 					event("error", "test");
 				})
 				.catch(data => data + "1", {passthrough: true})
@@ -174,11 +212,11 @@ describe("promise", function() {
 	});
 });
 
-describe("promisify", function() {
-	context("with one data parameter", function() {
-		it("should pass through the data", function(done) {
-			let func = function(caLLback) {
-				caLLback("test");
+describe("promisify", () => {
+	context("with one data parameter", () => {
+		it("should pass through the data", done => {
+			let func = callback => {
+				callback("test");
 			};
 	
 			index.promisify(func)()
@@ -189,10 +227,10 @@ describe("promisify", function() {
 		});
 	});
 
-	context("with an error as first parameter", function() {
-		it("should pass through the error", function(done) {
-			let func = function(caLLback) {
-				caLLback(new Error("test"));
+	context("with an error as first parameter", () => {
+		it("should pass through the error", done => {
+			let func = callback => {
+				callback(new Error("test"));
 			};
 	
 			index.promisify(func)()
@@ -202,5 +240,4 @@ describe("promisify", function() {
 			});
 		});
 	});
-	
 });
